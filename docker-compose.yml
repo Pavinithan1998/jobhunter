@@ -1,0 +1,14 @@
+# For running on a VPS, or testing the containerized build locally.
+# Usage: docker compose up --build -d
+# The `storage` folder is bind-mounted so the SQLite DB and generated
+# documents survive container restarts/rebuilds.
+services:
+  jobhunter-api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./storage:/app/storage
+    restart: unless-stopped

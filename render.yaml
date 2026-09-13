@@ -1,0 +1,40 @@
+# Deploy blueprint for render.com. In the Render dashboard: New -> Blueprint,
+# point it at this repo, and it will provision this service automatically.
+# You still need to fill in the secret env vars (API_KEY, ANTHROPIC_API_KEY,
+# etc.) in the Render dashboard after the first deploy -- they're marked
+# `sync: false` below so they're never committed to git.
+services:
+  - type: web
+    name: jobhunter-api
+    runtime: docker
+    plan: free
+    envVars:
+      - key: API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-4-6
+      - key: ADZUNA_APP_ID
+        sync: false
+      - key: ADZUNA_APP_KEY
+        sync: false
+      - key: ADZUNA_COUNTRY
+        value: gb
+      - key: JOOBLE_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: ENABLE_SCHEDULER
+        value: "true"
+      - key: DAILY_FETCH_HOUR
+        value: "18"
+      - key: DAILY_FETCH_MINUTE
+        value: "0"
+    disk:
+      # Persistent disk so storage/jobhunter.db and generated documents
+      # survive redeploys -- without this, Render's filesystem resets on
+      # every deploy and you'd lose all your data.
+      name: jobhunter-storage
+      mountPath: /app/storage
+      sizeGB: 1
